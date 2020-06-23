@@ -1,0 +1,246 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <ctype.h>
+#include <string.h>
+
+void brackprio(char* arr, int* start, int* end)
+{
+	int j = 0, a = 0, b = 9;
+	while (arr[j] != '\0')
+	{
+		if (arr[j] == '(')
+		{
+			start[a] = j;
+			a++;
+		}
+		else if (arr[j] == ')')
+		{
+			end[b] = j;
+			b--;
+		}
+		j++;
+	}
+}
+
+double operate(double a, double b, char oper)
+{
+	double res = 0;
+	switch (oper)
+	{
+	case '+':res = a + b; break;
+	case '-':res = a - b; break;
+	case '*':res = a * b; break;
+	case '/':res = a / b; break;
+	}
+	return res;
+}
+
+void Scan(char* arr, double* result, char* oper, int* start, int* end, double* fresult, char* foper)
+{
+	int j, z, digit, k, l, a, coun, ocoun, count;
+	double p;
+	j = 0;
+	k = 0;
+	z = -1;
+	l = 0;
+	p = 0;
+	a = 0;
+	count = 0;
+	coun = 1;
+	ocoun = 1;
+	digit = 0;
+	printf("Enter the expression(no brackets in brackets): ");
+	fgets(arr, 255, stdin);
+
+	brackprio(arr, start, end);
+	while ((arr[j] != '\0'))
+	{
+		if (arr[j] >= '0' && arr[j] <= '9')
+		{
+			digit = arr[j] - '0';
+			result[k] = result[k] * 10 + digit * p;
+			coun = 0;
+			ocoun = 0;
+			if (count == 1)
+			{
+				p *= 0.1;
+			}
+		}
+		else if (arr[j] == '.')
+		{
+			count = 1;
+		}
+		else if (coun == 0)
+		{
+			k++;
+			coun++;
+			p = 1;
+			count = 0;
+		}
+		if ((arr[j] == '+' || arr[j] == '-' || arr[j] == '*' || arr[j] == '/') && (ocoun == 0))
+		{
+			oper[l] = arr[j];
+			l++;
+		}
+		if ((arr[j] == '(') && (z == -1))
+		{
+			z++;
+			Calculate(a, result, oper, fresult, foper);
+		}
+		else if (arr[j] == start[z])
+		{
+			a = k;
+		}
+		if (arr[j] == end[9 - z])
+		{
+			Calculate(a, result, oper, fresult, foper);
+			z++;
+		}
+		j++;
+	}
+}
+
+int Calculate(int start, double* result, char* oper, double* fresult, char* foper)
+{
+	int j = 0;
+	if (start != 0)
+	{
+		j = start;
+	}
+	while ((result[j++] != 0.0113))
+	{
+		if (((oper[j++] == '*') || (oper[j++] == '/')) && (result[j + 2] != 0.113))
+		{
+			result[j++] = operate(result[j++], result[j + 2], oper[j++]);
+			result[j + 2] = result[j++];
+		}
+		if (result[j++] == result[j + 2])
+		{
+			result[j + 2] = operate(result[j], result[j++], oper[j]);
+			j++;
+		}
+		else
+			result[j++] = operate(result[j], result[j++], oper[j]);
+		j++;
+		if (result[j++] == 0.0113)
+		{
+			for (int i = 0; i < 30; i++)
+			{
+				if (fresult[i] != 0.0113)
+				{
+					fresult[i] = result[j];
+				}
+			}
+			for (int i = 0; i < 29; i++)
+			{
+				if (fresult[i] != 0)
+				{
+					foper[i] = oper[j];
+				}
+			}
+		}
+	}
+	return 1;
+}
+
+void frac(double num)
+{
+	int a = 1; int b = 1;
+	double eps = 0.0000001;
+	int ch, zn;
+	int mn = 2; // множитель для начального приближения
+	int iter = 0;
+	ch = a; zn = b;
+	// Поиск начального приближения
+	double c = 1;
+	do {
+		b++;
+		c = (double)a / b;
+	} while ((num - c) < 0);
+	if ((num - c) < eps)
+	{
+		ch = a; zn = b;
+		printf("%i/%i\n", ch, zn);
+		return;
+	}
+	b--;
+	c = (double)a / b;
+	if ((num - c) > -eps)
+	{
+		ch = a; zn = b;
+		printf("%i/%i\n", ch, zn);
+		return;
+	}
+	// Уточнение
+	while (iter < 20000)
+	{
+		int cc = a * mn, zz = b * mn;
+		iter++;
+		do {
+			zz++;
+			c = (double)cc / zz;
+		} while ((num - c) < 0);
+		if ((num - c) < eps)
+		{
+			ch = cc; zn = zz;
+			printf("%i/%i\n", ch, zn);
+			return;
+		}
+		zz--;
+		c = (double)cc / zz;
+		if ((num - c) > -eps)
+		{
+			ch = cc; zn = zz;
+			printf("%i/%i\n", ch, zn);
+			return;
+		}
+		mn++;
+	}
+	return;
+}
+
+int main(void)
+{
+	char c[255];
+	int b;
+	int start[10] = { 0 };
+	int end[10] = { 0 };
+	double result[30] = { 0.0113 };
+	char oper[29] = { 0 };
+	double fresult[30] = { 0.0113 };
+	char foper[29] = { 0 };
+	float answer = 0;
+
+	printf("1 - Arithmetic expression calculator.  2 - Convert decimat to proper fraction. ");
+	scanf_s("%i", &b);
+	switch (b)
+	{
+	case 1:
+		printf("AAAAAAAAAAAAAH ");
+		Scan(c, result, oper, start, end, fresult, foper);
+		break;
+	case 2:
+		printf("\n Enter decimal number. \n");
+		scanf_s("%f", &answer);
+		break;
+	default:
+		printf("Error");
+		exit(1);
+		break;
+	}
+	if (fresult[0] != 0.0113)
+	{
+		for (int j = 0; j < 30; j++)
+		{
+			if (fresult[j++] == 0.0113)
+			{
+				j = 30;
+				answer = fresult[j];
+			}
+			else
+				fresult[j++] = operate(fresult[j], fresult[j++], foper[j]);
+		}
+	}
+	frac(answer);
+}
