@@ -134,10 +134,11 @@ void Scan(double* result, char* oper, int* start, int* end, double* fresult, cha
 			oper++;
 			end++;
 			start++;
+			a = k;
 		}
 		j++;
 	}
-	if (start != 0)
+	if (*start != -1)
 	{
 		return;
 	}
@@ -155,13 +156,6 @@ void Scan(double* result, char* oper, int* start, int* end, double* fresult, cha
 int Calculate(int start, double* result, char* oper, double* fresult, char* foper)
 {
 	int j = 0, i = 0, k = 0;
-	if (start != 0)
-	{
-		for (int i = 0; i < start; i++)
-			result++;
-		for (int i = 0; i < start; i++)
-			oper++;
-	}
 	while ((*result != 0) && (*(result+1) != 0))
 	{
 		if (((*(oper+1) == '*') || (*(oper+1) == '/')) && (*(result + 2) != 0))
@@ -207,11 +201,38 @@ int Calculate(int start, double* result, char* oper, double* fresult, char* fope
 void frac(double num)
 {
 	int a = 1; int b = 1;
+	int p = 0;
 	double eps = 0.0000001;
 	int ch, zn;
 	int mn = 2; // множитель для начального приближения
 	int iter = 0;
 	ch = a; zn = b;
+	for (int i = 0; i < 10000; i++)
+	{
+		if (num > 1)
+		{
+			num--;
+			p += 1;
+		}
+		else if (num < -1)
+		{
+			num++;
+			p += -1;
+		}
+		else 
+		{
+			i = 10000;
+		}
+	}
+	printf("%i ", p);
+	if (num > 0) 
+	{
+		printf("+ ");
+	}
+	else
+	{
+		printf("- ");
+	}
 	// Поиск начального приближения
 	double c = 1;
 	do {
