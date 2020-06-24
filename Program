@@ -7,19 +7,19 @@
 void brackprio(char* arr, int* start, int* end)
 {
 	int j = 0, a = 0, b = 9;
-	while (arr[j] != '\0')
+	while (*arr != '\0')
 	{
-		if (arr[j] == '(')
+		if (*arr == '(')
 		{
-			start[a] = j;
-			a++;
+			*start = j;
+			start++;
 		}
-		else if (arr[j] == ')')
+		else if (*arr == ')')
 		{
-			end[b] = j;
-			b--;
+			*end = j;
+			end++;
 		}
-		j++;
+		arr++;
 	}
 }
 
@@ -36,15 +36,16 @@ double operate(double a, double b, char oper)
 	return res;
 }
 
-void Scan(char* arr, double* result, char* oper, int* start, int* end, double* fresult, char* foper)
+void Scan(double* result, char* oper, int* start, int* end, double* fresult, char* foper)
 {
 	int j, z, digit, k, l, a, coun, ocoun, count;
+	char arr[255];
 	double p;
 	j = 0;
 	k = 0;
 	z = -1;
 	l = 0;
-	p = 0;
+	p = 1;
 	a = 0;
 	count = 0;
 	coun = 1;
@@ -59,7 +60,7 @@ void Scan(char* arr, double* result, char* oper, int* start, int* end, double* f
 		if (arr[j] >= '0' && arr[j] <= '9')
 		{
 			digit = arr[j] - '0';
-			result[k] = result[k] * 10 + digit * p;
+			*result = *result * 10 + digit * p;
 			coun = 0;
 			ocoun = 0;
 			if (count == 1)
@@ -73,74 +74,94 @@ void Scan(char* arr, double* result, char* oper, int* start, int* end, double* f
 		}
 		else if (coun == 0)
 		{
-			k++;
+			result++;
 			coun++;
 			p = 1;
 			count = 0;
+			k++;
 		}
 		if ((arr[j] == '+' || arr[j] == '-' || arr[j] == '*' || arr[j] == '/') && (ocoun == 0))
 		{
-			oper[l] = arr[j];
+			*oper = arr[j];
+			oper++;
 			l++;
 		}
-		if ((arr[j] == '(') && (z == -1))
+		if ((arr[j] == '(') && (end == 0))
 		{
-			z++;
+			end++;
+			start++;
 			Calculate(a, result, oper, fresult, foper);
 		}
-		else if (arr[j] == start[z])
+		else if (j == *start)
 		{
 			a = k;
 		}
-		if (arr[j] == end[9 - z])
+		if (j == *end)
 		{
+			result - k;
+			oper - l;
 			Calculate(a, result, oper, fresult, foper);
-			z++;
+			end++;
+			start++;
+			result + k;
+			oper + l;
 		}
 		j++;
 	}
+	for(int i = 0; i < k; i++)
+		result--;
+	for (int i = 0; i < l; i++)
+		oper--;
+	if (arr[j] == '\0')
+		Calculate(a, result, oper, fresult, foper);
 }
 
 int Calculate(int start, double* result, char* oper, double* fresult, char* foper)
 {
-	int j = 0;
+	int j = 0, i = 0, k = 0;
 	if (start != 0)
 	{
-		j = start;
+		result += start;
 	}
-	while ((result[j++] != 0.0113))
+	while ((*result != 0) && (*(result++) != 0))
 	{
-		if (((oper[j++] == '*') || (oper[j++] == '/')) && (result[j + 2] != 0.113))
+		if (((*(oper++) == '*') || (*(oper++) == '/')) && (*(result + 2) != 0))
 		{
-			result[j++] = operate(result[j++], result[j + 2], oper[j++]);
-			result[j + 2] = result[j++];
+			*(result + 2) = operate(*(result++), *(result + 2), *(oper++));
+			*(result++) = 5.454647;
 		}
-		if (result[j++] == result[j + 2])
+		if (*(result++) == 5.454647)
 		{
-			result[j + 2] = operate(result[j], result[j++], oper[j]);
+			*(result + 2) = operate(*result, *(result++), *oper);
+			result++;
+			oper++;
 			j++;
 		}
 		else
-			result[j++] = operate(result[j], result[j++], oper[j]);
+			*(result++) = operate(*result, *(result++), *oper);
+		oper++;
+		result++;
 		j++;
-		if (result[j++] == 0.0113)
+	}
+	if ((*result != 0) && (*(result++) == 0) && (result - j == result))
+	{
+		*(fresult - j) = *result;
+	}
+	else if ((*(result++) == 0) && (*(result + 2) == 0))
+	{
+		*fresult = *result;
+		if (*fresult != 0)
 		{
-			for (int i = 0; i < 30; i++)
-			{
-				if (fresult[i] != 0.0113)
-				{
-					fresult[i] = result[j];
-				}
-			}
-			for (int i = 0; i < 29; i++)
-			{
-				if (fresult[i] != 0)
-				{
-					foper[i] = oper[j];
-				}
-			}
+			fresult++;
+		}
+		*foper = *oper;
+		if (*foper != 0)
+		{
+			foper++;
 		}
 	}
+	result - j;
+	oper - j + 1;
 	return 1;
 }
 
@@ -202,22 +223,21 @@ void frac(double num)
 
 int main(void)
 {
-	char c[255];
 	int b;
-	int start[10] = { 0 };
-	int end[10] = { 0 };
-	double result[30] = { 0.0113 };
+	int start[10] = { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1 };
+	int end[10] = { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1 };
+	double result[30] = { 0 };
 	char oper[29] = { 0 };
-	double fresult[30] = { 0.0113 };
+	double fresult[30] = { 0 };
 	char foper[29] = { 0 };
 	float answer = 0;
-
 	printf("1 - Arithmetic expression calculator.  2 - Convert decimat to proper fraction. ");
-	scanf_s("%i", &b);
+	scanf_s("%i%*c", &b);
 	switch (b)
 	{
 	case 1:
-		Scan(c, result, oper, start, end, fresult, foper);
+		printf("AAAAAAAAAAAAAH ");
+		Scan(result, oper, start, end, fresult, foper);
 		break;
 	case 2:
 		printf("\n Enter decimal number. \n");
@@ -228,11 +248,11 @@ int main(void)
 		exit(1);
 		break;
 	}
-	if (fresult[0] != 0.0113)
+	if ((fresult[0] != 0) && (fresult[1] != 0))
 	{
-		for (int j = 0; j < 30; j++)
+		for (int j = 0; j < 27; j++)
 		{
-			if (fresult[j++] == 0.0113)
+			if ((fresult[j++] == 0) && (fresult[j + 2] == 0))
 			{
 				j = 30;
 				answer = fresult[j];
@@ -241,5 +261,23 @@ int main(void)
 				fresult[j++] = operate(fresult[j], fresult[j++], foper[j]);
 		}
 	}
-	frac(answer);
+	else if (fresult[0] != 0)
+	{
+		answer = fresult[0];
+	}
+	int k = 0;
+	for (int i = 1; i < 9; i++)
+	{
+		if (fmod(answer * (10 ^ i), 10) != 0)
+		{
+			k++;
+		}
+	}
+	if (k == 0)
+	{
+		printf("%f", answer);
+	}
+	else
+		frac(answer);
+
 }
