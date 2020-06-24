@@ -6,7 +6,9 @@
 
 void brackprio(char* arr, int* start, int* end)
 {
-	int j = 0, a = 0, b = 9;
+	int j = 0;
+	start++;
+	end++;
 	while (*arr != '\0')
 	{
 		if (*arr == '(')
@@ -20,6 +22,7 @@ void brackprio(char* arr, int* start, int* end)
 			end++;
 		}
 		arr++;
+		j++;
 	}
 }
 
@@ -86,34 +89,67 @@ void Scan(double* result, char* oper, int* start, int* end, double* fresult, cha
 			oper++;
 			l++;
 		}
-		if ((arr[j] == '(') && (end == 0))
+		if ((arr[j] == '(') && (*start == -1))
 		{
+			for (int i = 0; i < k; i++)
+				result--;
+			for (int i = 0; i < l; i++)
+				oper--;
+
+			Calculate(a, result, oper, fresult, foper);
+			result++;
+			oper++;
 			end++;
 			start++;
-			Calculate(a, result, oper, fresult, foper);
+			a = k;
+			brackprio(arr, start, end);
 		}
 		else if (j == *start)
 		{
 			a = k;
 		}
-		if (j == *end)
+		if ((arr[j] == '(') && (end == 0))
 		{
-			result - k;
-			oper - l;
+			for (int i = 0; i < k - a; i++)
+				result--;
+			for (int i = 0; i < l - a; i++)
+				oper--;
+
 			Calculate(a, result, oper, fresult, foper);
+			result++;
+			oper++;
 			end++;
 			start++;
-			result + k;
-			oper + l;
+			a = k;
+			brackprio(arr, start, end);
+		}
+		else if (j == *end)
+		{
+			for (int i = 0; i < k - a; i++)
+				result--;
+			for (int i = 0; i < l - a; i++)
+				oper--;
+			Calculate(a, result, oper, fresult, foper);
+			result++;
+			oper++;
+			end++;
+			start++;
 		}
 		j++;
 	}
-	for(int i = 0; i < k; i++)
+	if (start != 0)
+	{
+		return;
+	}
+	else 
+	{
+	for (int i = 0; i < k - a; i++)
 		result--;
-	for (int i = 0; i < l; i++)
+	for (int i = 0; i < l - a; i++)
 		oper--;
 	if (arr[j] == '\0')
 		Calculate(a, result, oper, fresult, foper);
+	}
 }
 
 int Calculate(int start, double* result, char* oper, double* fresult, char* foper)
@@ -121,47 +157,50 @@ int Calculate(int start, double* result, char* oper, double* fresult, char* fope
 	int j = 0, i = 0, k = 0;
 	if (start != 0)
 	{
-		result += start;
+		for (int i = 0; i < start; i++)
+			result++;
+		for (int i = 0; i < start; i++)
+			oper++;
 	}
-	while ((*result != 0) && (*(result++) != 0))
+	while ((*result != 0) && (*(result+1) != 0))
 	{
-		if (((*(oper++) == '*') || (*(oper++) == '/')) && (*(result + 2) != 0))
+		if (((*(oper+1) == '*') || (*(oper+1) == '/')) && (*(result + 2) != 0))
 		{
-			*(result + 2) = operate(*(result++), *(result + 2), *(oper++));
-			*(result++) = 5.454647;
+			*(result + 2) = operate(*(result+1), *(result + 2), *(oper+1));
+			*(result+1) = 5.454647;
 		}
-		if (*(result++) == 5.454647)
+		if (*(result+1) == 5.454647)
 		{
-			*(result + 2) = operate(*result, *(result++), *oper);
+			*(result + 2) = operate(*result, *(result+2), *oper);
 			result++;
 			oper++;
 			j++;
 		}
 		else
-			*(result++) = operate(*result, *(result++), *oper);
+			*(result+1) = operate(*result, *(result+1), *oper);
 		oper++;
 		result++;
 		j++;
 	}
-	if ((*result != 0) && (*(result++) == 0) && (result - j == result))
+	if ((*result != 0) && (*(result+1) == 0) && (result - j == result)&&(oper[j]=='0'))
 	{
 		*(fresult - j) = *result;
 	}
-	else if ((*(result++) == 0) && (*(result + 2) == 0))
+	else if ((*(result+1) == 0) && (*(result + 2) == 0))
 	{
-		*fresult = *result;
 		if (*fresult != 0)
 		{
 			fresult++;
 		}
-		*foper = *oper;
+		*fresult = *result;
 		if (*foper != 0)
 		{
 			foper++;
 		}
+		*foper = *oper;
 	}
-	result - j;
-	oper - j + 1;
+	result++;
+	oper++;
 	return 1;
 }
 
@@ -254,8 +293,8 @@ int main(void)
 		{
 			if ((fresult[j++] == 0) && (fresult[j + 2] == 0))
 			{
-				j = 30;
 				answer = fresult[j];
+				j = 30;
 			}
 			else
 				fresult[j++] = operate(fresult[j], fresult[j++], foper[j]);
@@ -266,9 +305,11 @@ int main(void)
 		answer = fresult[0];
 	}
 	int k = 0;
+	double p = answer;
 	for (int i = 1; i < 9; i++)
 	{
-		if (fmod(answer * (10 ^ i), 10) != 0)
+		p *= 10;
+		if (fmod(p, 10) != 0)
 		{
 			k++;
 		}
