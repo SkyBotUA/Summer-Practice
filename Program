@@ -340,5 +340,4 @@ int main(void)
 	}
 	else
 		frac(answer);
-
 }
