@@ -63,13 +63,13 @@ void Scan(double* result, char* oper, int* start, int* end, double* fresult, cha
 		if (arr[j] >= '0' && arr[j] <= '9')
 		{
 			digit = arr[j] - '0';
-			*result = *result * 10 + digit * p;
-			coun = 0;
-			ocoun = 0;
 			if (count == 1)
 			{
 				p *= 0.1;
 			}
+			*result = *result * 10 + digit * p;
+			coun = 0;
+			ocoun = 0;
 		}
 		else if (arr[j] == '.')
 		{
@@ -142,45 +142,45 @@ void Scan(double* result, char* oper, int* start, int* end, double* fresult, cha
 	{
 		return;
 	}
-	else 
+	else
 	{
-	for (int i = 0; i < k - a; i++)
-		result--;
-	for (int i = 0; i < l - a; i++)
-		oper--;
-	if (arr[j] == '\0')
-		Calculate(a, result, oper, fresult, foper);
+		for (int i = 0; i < k - a; i++)
+			result--;
+		for (int i = 0; i < l - a; i++)
+			oper--;
+		if (arr[j] == '\0')
+			Calculate(a, result, oper, fresult, foper);
 	}
 }
 
 int Calculate(int start, double* result, char* oper, double* fresult, char* foper)
 {
 	int j = 0, i = 0, k = 0;
-	while ((*result != 0) && (*(result+1) != 0))
+	while ((*result != 0) && (*(result + 1) != 0))
 	{
-		if (((*(oper+1) == '*') || (*(oper+1) == '/')) && (*(result + 2) != 0))
+		if (((*(oper + 1) == '*') || (*(oper + 1) == '/')) && (*(result + 2) != 0))
 		{
-			*(result + 2) = operate(*(result+1), *(result + 2), *(oper+1));
-			*(result+1) = 5.454647;
+			*(result + 2) = operate(*(result + 1), *(result + 2), *(oper + 1));
+			*(result + 1) = 5.454647;
 		}
-		if (*(result+1) == 5.454647)
+		if (*(result + 1) == 5.454647)
 		{
-			*(result + 2) = operate(*result, *(result+2), *oper);
+			*(result + 2) = operate(*result, *(result + 2), *oper);
 			result++;
 			oper++;
 			j++;
 		}
 		else
-			*(result+1) = operate(*result, *(result+1), *oper);
+			*(result + 1) = operate(*result, *(result + 1), *oper);
 		oper++;
 		result++;
 		j++;
 	}
-	if ((*result != 0) && (*(result+1) == 0) && (result - j == result)&&(oper[j]=='0'))
+	if ((*result != 0) && (*(result + 1) == 0) && (result - j == result) && (oper[j] == '0'))
 	{
 		*(fresult - j) = *result;
 	}
-	else if ((*(result+1) == 0) && (*(result + 2) == 0))
+	else if ((*(result + 1) == 0) && (*(result + 2) == 0))
 	{
 		if (*fresult != 0)
 		{
@@ -219,13 +219,13 @@ void frac(double num)
 			num++;
 			p += -1;
 		}
-		else 
+		else
 		{
 			i = 10000;
 		}
 	}
 	printf("%i ", p);
-	if (num > 0) 
+	if (num > 0)
 	{
 		printf("+ ");
 	}
@@ -311,13 +311,13 @@ int main(void)
 	{
 		for (int j = 0; j < 27; j++)
 		{
-			if ((fresult[j+1] == 0) && (fresult[j + 2] == 0))
+			if ((fresult[j + 1] == 0) && (fresult[j + 2] == 0))
 			{
 				answer = fresult[j];
 				j = 30;
 			}
 			else
-				fresult[j+1] = operate(fresult[j], fresult[j+1], foper[j]);
+				fresult[j + 1] = operate(fresult[j], fresult[j + 1], foper[j]);
 		}
 	}
 	else if (fresult[0] != 0)
@@ -340,4 +340,5 @@ int main(void)
 	}
 	else
 		frac(answer);
+
 }
