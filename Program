@@ -312,13 +312,13 @@ int main(void)
 	{
 		for (int j = 0; j < 27; j++)
 		{
-			if ((fresult[j++] == 0) && (fresult[j + 2] == 0))
+			if ((fresult[j+1] == 0) && (fresult[j + 2] == 0))
 			{
 				answer = fresult[j];
 				j = 30;
 			}
 			else
-				fresult[j++] = operate(fresult[j], fresult[j++], foper[j]);
+				fresult[j+1] = operate(fresult[j], fresult[j+1], foper[j]);
 		}
 	}
 	else if (fresult[0] != 0)
