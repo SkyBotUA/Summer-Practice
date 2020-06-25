@@ -296,7 +296,6 @@ int main(void)
 	switch (b)
 	{
 	case 1:
-		printf("AAAAAAAAAAAAAH ");
 		Scan(result, oper, start, end, fresult, foper);
 		break;
 	case 2:
